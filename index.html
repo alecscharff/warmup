@@ -358,11 +358,11 @@ body::before {
 
 .tips-header {
   font-family: var(--font-m);
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--muted2);
   margin-bottom: 10px;
   flex-shrink: 0;
 }
@@ -381,9 +381,9 @@ body::before {
 .tip {
   display: flex;
   gap: 10px;
-  font-size: 0.8rem;
-  color: var(--muted2);
-  line-height: 1.55;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.5;
 }
 .tip-bullet {
   width: 4px; height: 4px;
@@ -440,7 +440,7 @@ body::before {
 /* Rep counter */
 .rep-display {
   font-family: var(--font-d);
-  font-size: 3.5rem;
+  font-size: clamp(2rem,8vw,3rem);
   line-height: 1;
   margin-bottom: 2px;
 }
@@ -450,7 +450,7 @@ body::before {
 
 .rep-sublabel {
   font-family: var(--font-m);
-  font-size: 0.58rem;
+  font-size: 0.64rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -485,39 +485,7 @@ body::before {
 /* ══════════════════════════════════════════════════════
    REST SCREEN
 ══════════════════════════════════════════════════════ */
-#restScreen {
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 0;
-}
-
-.rest-eyebrow {
-  font-family: var(--font-m);
-  font-size: 0.66rem;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--muted2);
-  margin-bottom: 16px;
-}
-
-.rest-timer {
-  font-family: var(--font-m);
-  font-size: 9rem;
-  font-weight: 700;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  margin-bottom: 32px;
-}
-.rest-timer.hot   { color: var(--hot);   text-shadow: 0 0 60px var(--hot-glow); }
-.rest-timer.sky   { color: var(--sky);   text-shadow: 0 0 60px var(--sky-glow); }
-.rest-timer.spark { color: var(--spark); text-shadow: 0 0 60px var(--spark-glow); }
-
-.next-label {
-  font-family: var(--font-m);
-  font-size: 0.6rem;
+/* rest screen styles removed */
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -688,46 +656,12 @@ body::before {
 .btn-done:hover  { filter: brightness(1.1); transform: translateY(-2px); }
 .btn-done:active { transform: scale(0.97); }
 
-/* ══════════════════════════════════════════════════════
-   COUNTDOWN OVERLAY
-══════════════════════════════════════════════════════ */
-.countdown-overlay {
-  position: fixed; inset: 0;
-  background: rgba(5,8,16,0.96);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  flex-direction: column;
-  gap: 14px;
-}
-.countdown-overlay.active { display: flex; }
-
-.countdown-number {
-  font-family: var(--font-d);
-  font-size: 14rem;
-  color: var(--hot);
-  line-height: 1;
-  text-shadow: 0 0 100px var(--hot-glow);
-  animation: countPop 0.7s cubic-bezier(0.34,1.56,0.64,1);
-}
-@keyframes countPop {
-  from { transform: scale(1.5); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
-}
-.countdown-text {
-  font-family: var(--font-m);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--muted2);
-}
 
 /* ══ Responsive ══ */
 @media (max-width: 900px) {
-  .exercise-main { grid-template-columns: 1fr; grid-template-rows: 38vh 1fr; }
-  .ex-name { font-size: 2rem; }
+  .exercise-main { grid-template-columns: 1fr; grid-template-rows: 44vh 1fr; }
+  .ex-name { font-size: 2.2rem; }
+  .rep-display { font-size: 2.4rem; }
 }
 @media (max-width: 600px) {
   .screen { padding: 20px; }
@@ -738,11 +672,6 @@ body::before {
 </head>
 <body>
 
-<!-- Countdown Overlay -->
-<div class="countdown-overlay" id="countdownOverlay">
-  <div class="countdown-number" id="countdownNumber">3</div>
-  <div class="countdown-text"   id="countdownText">GET MOVING</div>
-</div>
 
 <!-- ══════ START SCREEN ══════ -->
 <div class="screen active" id="startScreen">
@@ -793,13 +722,6 @@ body::before {
 </div>
 
 <!-- ══════ REST SCREEN ══════ -->
-<div class="screen" id="restScreen">
-  <div class="rest-eyebrow">● Recovery</div>
-  <div class="rest-timer hot" id="restTimer">10</div>
-  <div class="next-label">Up Next</div>
-  <div class="next-name" id="nextExName">—</div>
-  <button class="btn-skip-rest" onclick="skipRest()">Skip →</button>
-</div>
 
 <!-- ══════ PHASE TRANSITION SCREEN ══════ -->
 <div class="screen" id="transitionScreen">
@@ -938,8 +860,7 @@ const WARMUP_PHASES = [
   { phaseId: 2, exercises: [
     {
       name: "Lunge and Reach",
-      video: "https://www.youtube.com/embed/3h1Q8Nm_Izs",
-      gif: "https://images.contentstack.io/v3/assets/blt45c082eaf9747747/blt4534283cebcb84fc/5f92a2336c73a0751fc784a2/FL_1_Blog-Header-Pics_1232-x-630_V2_lungeandreach.jpg?format=pjpg&auto=webp&quality=76&width=1232",
+      gif: "gifs/3h1Q8Nm_Izs.gif",
       targets: "Hip Flexors · T-Spine · Shoulders",
       type: "reps", reps: "6 each side", rest: 5,
       tips: [
@@ -950,7 +871,6 @@ const WARMUP_PHASES = [
     },
     {
       name: "High Knee Hugs",
-      video: "https://www.youtube.com/embed/Re1haQf-j3o",
       gif: "https://media1.popsugar-assets.com/files/thumbor/ER8JnAmYMtH8P8syWooCSS150mc/fit-in/2048xorig/filters:format_auto-!!-:strip_icc-!!-/2021/01/08/922/n/1922729/48f6b65a1c5a91f4_2c84e89353d79cb9_EXAMPLE.Knee-Hugs/i/Warmup-Exercise-1-Standing-Knee-Hug.gif",
       targets: "Glutes · Hip Rotators · Balance",
       type: "reps", reps: "8 each side", rest: 5,
@@ -962,8 +882,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Figure-4 Hugs",
-      video: "https://www.youtube.com/embed/qOoeym_Xu0s",
-      gif: "",
+      gif: "gifs/qOoeym_Xu0s.gif",
       targets: "Piriformis · IT Band · Hip External Rotators",
       type: "reps", reps: "8 each side", rest: 5,
       tips: [
@@ -974,8 +893,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Drinking Bird",
-      video: "https://www.youtube.com/embed/ppwcnnOIizg",
-      gif: "https://images.ctfassets.net/6ilvqec50fal/5793oZlBbtl5h2lDFravsH/27cc09caed8e2312c0e5adaa72acded7/single_leg_deadlift.gif",
+      gif: "gifs/ppwcnnOIizg.gif",
       targets: "Hamstrings · Glutes · Proprioception",
       type: "reps", reps: "8 each side", rest: 5,
       tips: [
@@ -986,8 +904,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Walking Quad Stretch",
-      video: "https://www.youtube.com/embed/05TNLo-d2i0",
-      gif: "",
+      gif: "gifs/05TNLo-d2i0.gif",
       targets: "Quads · Hip Flexors · Balance",
       type: "reps", reps: "10 each side", rest: 5,
       tips: [
@@ -998,8 +915,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Side-Side-Middle Lunge",
-      video: "https://www.youtube.com/embed/jJslMqcz_XQ",
-      gif: "",
+      gif: "gifs/jJslMqcz_XQ.gif",
       targets: "Adductors · Quads · Hip Mobility",
       type: "reps", reps: "6 each direction", rest: 5,
       tips: [
@@ -1010,8 +926,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "T-Spine Rotation",
-      video: "https://www.youtube.com/embed/xi48S_aB_FA",
-      gif: "",
+      gif: "gifs/xi48S_aB_FA.gif",
       targets: "Thoracic Spine · Shoulders · Rotators",
       type: "reps", reps: "5 each side", rest: 5,
       tips: [
@@ -1022,8 +937,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Penguin Walk",
-      video: "https://www.youtube.com/embed/cJvms057Rg4",
-      gif: "",
+      gif: "gifs/cJvms057Rg4.gif",
       targets: "Hip Internal Rotators · Ankle Stability",
       type: "timer", duration: 30, rest: 10,
       tips: [
@@ -1038,8 +952,7 @@ const WARMUP_PHASES = [
   { phaseId: 3, exercises: [
     {
       name: "Cycle Kicks",
-      video: "https://www.youtube.com/embed/kpiIju-hlCQ",
-      gif: "",
+      gif: "gifs/kpiIju-hlCQ.gif",
       targets: "Hip Flexors · Glutes · Explosive Power",
       type: "timer", duration: 20, rest: 15,
       tips: [
@@ -1050,8 +963,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Lateral High Knee Skip",
-      video: "https://www.youtube.com/embed/0f5vlORVS-A",
-      gif: "",
+      gif: "gifs/0f5vlORVS-A.gif",
       targets: "Hip Flexors · Lateral Agility · Coordination",
       type: "timer", duration: 20, rest: 15,
       tips: [
@@ -1062,8 +974,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Lateral Skips",
-      video: "https://www.youtube.com/embed/pQ9ioYNQc7w",
-      gif: "",
+      gif: "gifs/pQ9ioYNQc7w.gif",
       targets: "Calf Power · Lateral Movement · Coordination",
       type: "timer", duration: 20, rest: 15,
       tips: [
@@ -1074,8 +985,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Falling Leaf",
-      video: "https://www.youtube.com/embed/rKW48yWXBpo",
-      gif: "",
+      gif: "gifs/rKW48yWXBpo.gif",
       targets: "Coordination · Hip Rotation · Full Body",
       type: "timer", duration: 20, rest: 15,
       tips: [
@@ -1086,8 +996,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Leprechaun Skips",
-      video: "https://www.youtube.com/embed/JGv2VwqFXS8",
-      gif: "",
+      gif: "gifs/JGv2VwqFXS8.gif",
       targets: "Single-Leg Drive · Calf Power · Rhythm",
       type: "timer", duration: 20, rest: 0,
       tips: [
@@ -1137,34 +1046,13 @@ function showScreen(id) {
 function startWarmup() {
   state.flatIndex = 0;
   state.startTime = Date.now();
-  showCountdown('Get Moving!', showExercise);
+  // jump straight into first exercise
+  showExercise();
 }
 
 // ═══════════════════════════════════════════════════════════════
 // COUNTDOWN
 // ═══════════════════════════════════════════════════════════════
-function showCountdown(text, cb) {
-  const overlay = document.getElementById('countdownOverlay');
-  const numEl   = document.getElementById('countdownNumber');
-  const txtEl   = document.getElementById('countdownText');
-  txtEl.textContent = text.toUpperCase();
-  overlay.classList.add('active');
-  let n = 3;
-  numEl.textContent = n;
-  const iv = setInterval(() => {
-    n--;
-    if (n <= 0) {
-      clearInterval(iv);
-      overlay.classList.remove('active');
-      cb();
-    } else {
-      numEl.style.animation = 'none';
-      void numEl.offsetWidth;
-      numEl.style.animation = '';
-      numEl.textContent = n;
-    }
-  }, 800);
-}
 
 // ═══════════════════════════════════════════════════════════════
 // SHOW EXERCISE
@@ -1197,8 +1085,13 @@ function showExercise() {
   // media (video/gif)
   const gifContent = document.getElementById('gifContent');
   if (ex.video) {
-    // embed youtube video
-    gifContent.innerHTML = `<iframe src="${ex.video}?rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    // embed youtube iframe configured as a looping silent clip (gif‑like)
+    let src = ex.video + "?rel=0&modestbranding=1&autoplay=1&mute=1&loop=1";
+    if (ex.video.includes('/embed/')) {
+      const vidId = ex.video.split('/embed/')[1];
+      src += `&playlist=${vidId}`; // required for loop to work
+    }
+    gifContent.innerHTML = `<iframe src="${src}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   } else if (ex.gif) {
     const esc = ex.name.replace(/'/g, "\\'");
     gifContent.innerHTML = `<img src="${ex.gif}" alt="${ex.name}" onerror="onGifError(this,'${esc}','${cls}')">`;
@@ -1353,7 +1246,8 @@ function completeExercise() {
   if (state.flatIndex >= flatList.length) { showComplete(); return; }
   const nextEx = flatList[state.flatIndex];
   if (nextEx.phaseId !== ex.phaseId) { showPhaseTransition(ex.phaseId); return; }
-  ex.rest > 0 ? showRest(ex.rest, nextEx) : showExercise();
+  // skip any rest logic, go right to next exercise
+  showExercise();
 }
 
 function skipExercise() {
@@ -1366,24 +1260,7 @@ function skipExercise() {
   showExercise();
 }
 
-function showRest(seconds, nextEx) {
-  showScreen('restScreen');
-  const ex  = flatList[state.flatIndex - 1];
-  const cls = ex ? getPhase(ex.phaseId).cls : 'hot';
-  const el  = document.getElementById('restTimer');
-  el.className  = `rest-timer ${cls}`;
-  el.textContent = seconds;
-  document.getElementById('nextExName').textContent = nextEx?.name || '—';
 
-  state.timerSeconds = seconds;
-  state.timerInterval = setInterval(() => {
-    state.timerSeconds--;
-    el.textContent = state.timerSeconds;
-    if (state.timerSeconds <= 0) { clearTimer(); playBeep(); showExercise(); }
-  }, 1000);
-}
-
-function skipRest() { clearTimer(); showExercise(); }
 
 // ═══════════════════════════════════════════════════════════════
 // PHASE TRANSITIONS
@@ -1406,9 +1283,8 @@ function showPhaseTransition(completedPhaseId) {
 }
 
 function continueAfterTransition() {
-  const ex    = flatList[state.flatIndex];
-  const phase = getPhase(ex?.phaseId || 1);
-  showCountdown(phase.name, showExercise);
+  // simply show next exercise after phase transition
+  showExercise();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1453,11 +1329,11 @@ document.addEventListener('keydown', e => {
       const timerBtn = document.getElementById('timerBtn');
       timerBtn ? toggleTimer() : completeExercise();
     }
-    else if (active('restScreen')) skipRest();
+    
   }
   if (e.code === 'ArrowRight' || e.code === 'KeyN') {
     if      (active('exerciseScreen'))   skipExercise();
-    else if (active('restScreen'))       skipRest();
+    
     else if (active('transitionScreen')) continueAfterTransition();
   }
   if (e.code === 'ArrowLeft' || e.code === 'KeyP') {
