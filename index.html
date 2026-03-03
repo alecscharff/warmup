@@ -236,7 +236,8 @@ body::before {
   letter-spacing: 0.06em;
 }
 
-.btn-skip-inline {
+.btn-skip-inline,
+.btn-back-inline {
   background: none;
   border: 1px solid var(--border);
   color: var(--muted2);
@@ -250,7 +251,8 @@ body::before {
   cursor: pointer;
   transition: all 0.14s;
 }
-.btn-skip-inline:hover { border-color: var(--muted2); color: var(--text); }
+.btn-skip-inline:hover,
+.btn-back-inline:hover { border-color: var(--muted2); color: var(--text); }
 
 .progress-track {
   height: 2px;
@@ -288,11 +290,12 @@ body::before {
   min-height: 0;
 }
 
-.gif-area img {
+.gif-area img,
+.gif-area iframe {
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
+} 
 
 .gif-fallback {
   display: flex;
@@ -766,6 +769,7 @@ body::before {
       <span id="phaseLabel">MOVEMENT</span>
     </div>
     <div class="top-right">
+      <button class="btn-ghost btn-back-inline" onclick="prevExercise()">← Back</button>
       <span class="progress-text" id="progressText">1 / 5</span>
       <button class="btn-skip-inline" onclick="skipExercise()">Skip →</button>
     </div>
@@ -859,57 +863,72 @@ const WARMUP_PHASES = [
   // ── PART 1: Movement Activation ────────────────────────────
   { phaseId: 1, exercises: [
     {
-      name: "Forward Run (60%)",
+      name: "Forward Run (60% to half field)",
       gif: "",
       targets: "Full Body · Cardio Activation",
-      type: "timer", duration: 30, rest: 5,
+      type: "reps",
+      reps: "to half field",
+      sublabel: "distance",
+      rest: 5,
       tips: [
         "Run at a conversational 60% effort — this is about blood flow, not performance",
-        "Focus on mechanics: upright posture, relaxed arms, mid-foot strike",
-        "On a field, go to half-field and back"
+        "Head straight to the half‑field line, then jog back",
+        "Focus on mechanics: upright posture, relaxed arms, mid-foot strike"
       ]
     },
     {
-      name: "Backward Run",
+      name: "Backward Run (half field)",
       gif: "",
       targets: "Calves · Glutes · Coordination",
-      type: "timer", duration: 30, rest: 5,
+      type: "reps",
+      reps: "to half field",
+      sublabel: "distance",
+      rest: 5,
       tips: [
         "Take large, deliberate strides — push back with each step",
         "Keep your chest up; glance over one shoulder to navigate",
-        "Feel your calves and glutes light up — this is intentional posterior chain work"
+        "Cover half the field before turning around"
       ]
     },
     {
-      name: "Backward Skip",
+      name: "Backward Skip (40 yards)",
       gif: "",
       targets: "Hip Flexors · Coordination · Rhythm",
-      type: "timer", duration: 30, rest: 5,
+      type: "reps",
+      reps: "40 yards",
+      sublabel: "distance",
+      rest: 5,
       tips: [
         "Rhythm matters more than speed — find a comfortable tempo going backward",
         "Drive knees up slightly with each skip",
-        "Use your arms for balance; let them swing naturally"
+        "In the original routine this is done for about 40 yards"
       ]
     },
     {
-      name: "Casual Skip",
+      name: "Casual Skip (half field)",
       gif: "",
       targets: "Hip Flexors · Rhythm · Relaxation",
-      type: "timer", duration: 30, rest: 5,
+      type: "reps",
+      reps: "to half field",
+      sublabel: "distance",
+      rest: 5,
       tips: [
         "A true casual skip — loose, rhythmic, and easy",
-        "Cover ground with each skip; don't rush",
+        "Cover the half-field distance with each skip; don't rush",
         "This is active recovery — let the warmup settle into your body"
       ]
     },
     {
-      name: "Low Defensive Shuffle",
+      name: "Low Defensive Shuffle (half field)",
       gif: "",
       targets: "Glutes · Hip Abductors · Lateral Movement",
-      type: "timer", duration: 30, rest: 10,
+      type: "reps",
+      reps: "to half field",
+      sublabel: "distance",
+      rest: 10,
       tips: [
         "Get into a low defensive stance: knees bent, hips back, chest up",
-        "Shuffle laterally, changing direction every 4 steps",
+        "Shuffle laterally to the half‑field line, changing direction every 4 steps",
         "Keep feet from crossing — quick, controlled lateral steps"
       ]
     },
@@ -919,7 +938,8 @@ const WARMUP_PHASES = [
   { phaseId: 2, exercises: [
     {
       name: "Lunge and Reach",
-      gif: "https://images.ctfassets.net/6ilvqec50fal/1nXwzRgW4ZeQ6E5KaQcqLh/2af9be36d4c7d1c8ecd162eb8d850006/Rad_reverse_lunges.gif",
+      video: "https://www.youtube.com/embed/3h1Q8Nm_Izs",
+      gif: "https://images.contentstack.io/v3/assets/blt45c082eaf9747747/blt4534283cebcb84fc/5f92a2336c73a0751fc784a2/FL_1_Blog-Header-Pics_1232-x-630_V2_lungeandreach.jpg?format=pjpg&auto=webp&quality=76&width=1232",
       targets: "Hip Flexors · T-Spine · Shoulders",
       type: "reps", reps: "6 each side", rest: 5,
       tips: [
@@ -930,7 +950,8 @@ const WARMUP_PHASES = [
     },
     {
       name: "High Knee Hugs",
-      gif: "https://images.ctfassets.net/6ilvqec50fal/59xk5cwZL30GccWCrYZhKH/0750544e2f629e4668b729a6ec3d9188/High_Knees.gif",
+      video: "https://www.youtube.com/embed/Re1haQf-j3o",
+      gif: "https://media1.popsugar-assets.com/files/thumbor/ER8JnAmYMtH8P8syWooCSS150mc/fit-in/2048xorig/filters:format_auto-!!-:strip_icc-!!-/2021/01/08/922/n/1922729/48f6b65a1c5a91f4_2c84e89353d79cb9_EXAMPLE.Knee-Hugs/i/Warmup-Exercise-1-Standing-Knee-Hug.gif",
       targets: "Glutes · Hip Rotators · Balance",
       type: "reps", reps: "8 each side", rest: 5,
       tips: [
@@ -941,6 +962,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Figure-4 Hugs",
+      video: "https://www.youtube.com/embed/qOoeym_Xu0s",
       gif: "",
       targets: "Piriformis · IT Band · Hip External Rotators",
       type: "reps", reps: "8 each side", rest: 5,
@@ -952,6 +974,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Drinking Bird",
+      video: "https://www.youtube.com/embed/ppwcnnOIizg",
       gif: "https://images.ctfassets.net/6ilvqec50fal/5793oZlBbtl5h2lDFravsH/27cc09caed8e2312c0e5adaa72acded7/single_leg_deadlift.gif",
       targets: "Hamstrings · Glutes · Proprioception",
       type: "reps", reps: "8 each side", rest: 5,
@@ -963,6 +986,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Walking Quad Stretch",
+      video: "https://www.youtube.com/embed/05TNLo-d2i0",
       gif: "",
       targets: "Quads · Hip Flexors · Balance",
       type: "reps", reps: "10 each side", rest: 5,
@@ -974,6 +998,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Side-Side-Middle Lunge",
+      video: "https://www.youtube.com/embed/jJslMqcz_XQ",
       gif: "",
       targets: "Adductors · Quads · Hip Mobility",
       type: "reps", reps: "6 each direction", rest: 5,
@@ -985,6 +1010,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "T-Spine Rotation",
+      video: "https://www.youtube.com/embed/xi48S_aB_FA",
       gif: "",
       targets: "Thoracic Spine · Shoulders · Rotators",
       type: "reps", reps: "5 each side", rest: 5,
@@ -996,6 +1022,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Penguin Walk",
+      video: "https://www.youtube.com/embed/cJvms057Rg4",
       gif: "",
       targets: "Hip Internal Rotators · Ankle Stability",
       type: "timer", duration: 30, rest: 10,
@@ -1011,6 +1038,7 @@ const WARMUP_PHASES = [
   { phaseId: 3, exercises: [
     {
       name: "Cycle Kicks",
+      video: "https://www.youtube.com/embed/kpiIju-hlCQ",
       gif: "",
       targets: "Hip Flexors · Glutes · Explosive Power",
       type: "timer", duration: 20, rest: 15,
@@ -1022,6 +1050,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Lateral High Knee Skip",
+      video: "https://www.youtube.com/embed/0f5vlORVS-A",
       gif: "",
       targets: "Hip Flexors · Lateral Agility · Coordination",
       type: "timer", duration: 20, rest: 15,
@@ -1033,6 +1062,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Lateral Skips",
+      video: "https://www.youtube.com/embed/pQ9ioYNQc7w",
       gif: "",
       targets: "Calf Power · Lateral Movement · Coordination",
       type: "timer", duration: 20, rest: 15,
@@ -1044,6 +1074,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Falling Leaf",
+      video: "https://www.youtube.com/embed/rKW48yWXBpo",
       gif: "",
       targets: "Coordination · Hip Rotation · Full Body",
       type: "timer", duration: 20, rest: 15,
@@ -1055,6 +1086,7 @@ const WARMUP_PHASES = [
     },
     {
       name: "Leprechaun Skips",
+      video: "https://www.youtube.com/embed/JGv2VwqFXS8",
       gif: "",
       targets: "Single-Leg Drive · Calf Power · Rhythm",
       type: "timer", duration: 20, rest: 0,
@@ -1162,9 +1194,12 @@ function showExercise() {
   fill.className     = `progress-fill ${cls}`;
   fill.style.width   = ((state.flatIndex + 1) / flatList.length * 100) + '%';
 
-  // GIF
+  // media (video/gif)
   const gifContent = document.getElementById('gifContent');
-  if (ex.gif) {
+  if (ex.video) {
+    // embed youtube video
+    gifContent.innerHTML = `<iframe src="${ex.video}?rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  } else if (ex.gif) {
     const esc = ex.name.replace(/'/g, "\\'");
     gifContent.innerHTML = `<img src="${ex.gif}" alt="${ex.name}" onerror="onGifError(this,'${esc}','${cls}')">`;
   } else {
@@ -1236,7 +1271,7 @@ function renderAction(ex, cls) {
     const repText = typeof ex.reps === 'string' ? ex.reps : `${ex.reps} reps`;
     html += `
       <div class="rep-display ${cls}">${repText}</div>
-      <div class="rep-sublabel">reps</div>`;
+      <div class="rep-sublabel">${ex.sublabel || 'reps'}</div>`;
   }
 
   html += `
@@ -1257,6 +1292,15 @@ function renderAction(ex, cls) {
 function formatTime(s) { return s; }
 
 function toggleTimer() { state.timerRunning ? pauseTimer() : startTimer(); }
+
+// allow user to navigate backward through exercises
+function prevExercise() {
+  clearTimer();
+  if (state.flatIndex > 0) {
+    state.flatIndex--;
+    showExercise();
+  }
+}
 
 function startTimer() {
   state.timerRunning = true;
@@ -1415,6 +1459,9 @@ document.addEventListener('keydown', e => {
     if      (active('exerciseScreen'))   skipExercise();
     else if (active('restScreen'))       skipRest();
     else if (active('transitionScreen')) continueAfterTransition();
+  }
+  if (e.code === 'ArrowLeft' || e.code === 'KeyP') {
+    if (active('exerciseScreen')) prevExercise();
   }
 });
 </script>
