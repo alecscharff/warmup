@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Ready — UAP Warm-Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:          #050810;
+  --surface:     #090D1A;
+  --card:        #0E1525;
+  --border:      #192035;
+  --hot:         #FF5714;
+  --hot-dim:     rgba(255,87,20,0.08);
+  --hot-glow:    rgba(255,87,20,0.4);
+  --sky:         #00C8FF;
+  --sky-dim:     rgba(0,200,255,0.08);
+  --sky-glow:    rgba(0,200,255,0.4);
+  --spark:       #FF1B6B;
+  --spark-dim:   rgba(255,27,107,0.08);
+  --spark-glow:  rgba(255,27,107,0.4);
+  --text:        #EDF2FF;
+  --muted:       #344060;
+  --muted2:      #7080A0;
+  --font-d:      'Antonio', sans-serif;
+  --font-m:      'JetBrains Mono', monospace;
+  --font-b:      'DM Sans', sans-serif;
+  --r:           12px;
+  --r-sm:        8px;
+}
+
+body {
+  font-family: var(--font-b);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Diagonal field-line texture */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: repeating-linear-gradient(
+    -52deg,
+    transparent, transparent 90px,
+    rgba(255,255,255,0.013) 90px,
+    rgba(255,255,255,0.013) 91px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Spectrum stripe */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--hot) 0%, var(--sky) 50%, var(--spark) 100%);
+  z-index: 300;
+}
+
+.screen, .countdown-overlay { position: relative; z-index: 1; }
+
+/* ══════════════════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════════════════ */
+.screen { display: none; width: 100vw; height: 100vh; padding: 32px 44px; }
+.screen.active { display: flex; }
+.fade-in { animation: fadeIn 0.24s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════════════════
+   START SCREEN
+══════════════════════════════════════════════════════ */
+#startScreen {
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.start-eyebrow {
+  font-family: var(--font-m);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--hot);
+  margin-bottom: 8px;
+}
+
+.start-title {
+  font-family: var(--font-d);
+  font-size: clamp(5rem, 13vw, 10.5rem);
+  line-height: 0.88;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+.start-title em { color: var(--hot); font-style: normal; }
+
+.phase-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.phase-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+.phase-chip.hot   { color: var(--hot);   border-color: rgba(255,87,20,0.3);   background: var(--hot-dim); }
+.phase-chip.sky   { color: var(--sky);   border-color: rgba(0,200,255,0.3);   background: var(--sky-dim); }
+.phase-chip.spark { color: var(--spark); border-color: rgba(255,27,107,0.3);  background: var(--spark-dim); }
+
+.chip-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.start-meta {
+  font-family: var(--font-m);
+  font-size: 0.68rem;
+  color: var(--muted2);
+  letter-spacing: 0.1em;
+  margin-bottom: 36px;
+}
+
+.start-cta { display: flex; align-items: center; gap: 20px; }
+
+.btn-start {
+  background: var(--hot);
+  color: var(--bg);
+  font-family: var(--font-d);
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  padding: 15px 48px;
+  border: none;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: filter 0.12s, transform 0.12s;
+}
+.btn-start:hover  { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-start:active { transform: scale(0.98); }
+
+.start-hint {
+  font-family: var(--font-m);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.start-deco {
+  position: absolute;
+  right: -30px;
+  bottom: -50px;
+  font-family: var(--font-d);
+  font-size: clamp(12rem, 30vw, 28rem);
+  color: rgba(255,87,20,0.04);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════
+   EXERCISE SCREEN
+══════════════════════════════════════════════════════ */
+#exerciseScreen {
+  flex-direction: column;
+  gap: 0;
+  padding-top: 16px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding-bottom: 12px;
+}
+
+.phase-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border-radius: 100px;
+  font-family: var(--font-m);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+.phase-pill .dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  animation: blink 1.8s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+.phase-pill.hot   { color:var(--hot);   border-color:rgba(255,87,20,0.3);   background:var(--hot-dim); }
+.phase-pill.hot .dot { background:var(--hot); }
+.phase-pill.sky   { color:var(--sky);   border-color:rgba(0,200,255,0.3);   background:var(--sky-dim); }
+.phase-pill.sky .dot { background:var(--sky); }
+.phase-pill.spark { color:var(--spark); border-color:rgba(255,27,107,0.3);  background:var(--spark-dim); }
+.phase-pill.spark .dot { background:var(--spark); }
+
+.top-right { display: flex; align-items: center; gap: 14px; }
+
+.progress-text {
+  font-family: var(--font-m);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--muted2);
+  letter-spacing: 0.06em;
+}
+
+.btn-skip-inline {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted2);
+  padding: 5px 13px;
+  border-radius: var(--r-sm);
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.14s;
+}
+.btn-skip-inline:hover { border-color: var(--muted2); color: var(--text); }
+
+.progress-track {
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.progress-fill.hot   { background: var(--hot); }
+.progress-fill.sky   { background: var(--sky); }
+.progress-fill.spark { background: var(--spark); }
+
+.exercise-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 0.72fr;
+  gap: 22px;
+  min-height: 0;
+}
+
+.gif-area {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.gif-area img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.gif-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 24px;
+}
+.gif-fallback .icon { font-size: 4rem; }
+.gif-fallback .name {
+  font-family: var(--font-d);
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  color: var(--muted2);
+  text-align: center;
+}
+.gif-fallback .desc {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.ex-targets {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.ex-targets.hot   { color: var(--hot); }
+.ex-targets.sky   { color: var(--sky); }
+.ex-targets.spark { color: var(--spark); }
+
+.ex-name {
+  font-family: var(--font-d);
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.panel-divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.tips-header {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  margin-bottom: 14px;
+}
+.tips-list::-webkit-scrollbar { display: none; }
+
+.tip {
+  display: flex;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--muted2);
+  line-height: 1.55;
+}
+.tip-bullet {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+
+.action-area { flex-shrink: 0; }
+
+/* Timer ring */
+.timer-ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.timer-ring-svg {
+  width: 88px;
+  height: 88px;
+  cursor: pointer;
+  transition: transform 0.14s;
+}
+.timer-ring-svg:hover { transform: scale(1.05); }
+
+.timer-ring-fill {
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-ring-text {
+  font-family: var(--font-m);
+  font-size: 17px;
+  font-weight: 700;
+  fill: var(--text);
+  dominant-baseline: central;
+  text-anchor: middle;
+  letter-spacing: 1px;
+}
+
+.timer-ring-state {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.timer-ring-state.hot   { color: var(--hot); }
+.timer-ring-state.sky   { color: var(--sky); }
+.timer-ring-state.spark { color: var(--spark); }
+
+/* Rep counter */
+.rep-display {
+  font-family: var(--font-d);
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.rep-display.hot   { color: var(--hot); }
+.rep-display.sky   { color: var(--sky); }
+.rep-display.spark { color: var(--spark); }
+
+.rep-sublabel {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.btn {
+  font-family: var(--font-d);
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  padding: 11px 26px;
+  border-radius: var(--r-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-primary.hot   { background: var(--hot);   color: var(--bg); }
+.btn-primary.sky   { background: var(--sky);   color: var(--bg); }
+.btn-primary.spark { background: var(--spark); color: var(--bg); }
+.btn-primary:hover  { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted2);
+}
+.btn-ghost:hover { border-color: var(--muted2); color: var(--text); }
+.btn-row { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+
+/* ══════════════════════════════════════════════════════
+   REST SCREEN
+══════════════════════════════════════════════════════ */
+#restScreen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0;
+}
+
+.rest-eyebrow {
+  font-family: var(--font-m);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  margin-bottom: 16px;
+}
+
+.rest-timer {
+  font-family: var(--font-m);
+  font-size: 9rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 32px;
+}
+.rest-timer.hot   { color: var(--hot);   text-shadow: 0 0 60px var(--hot-glow); }
+.rest-timer.sky   { color: var(--sky);   text-shadow: 0 0 60px var(--sky-glow); }
+.rest-timer.spark { color: var(--spark); text-shadow: 0 0 60px var(--spark-glow); }
+
+.next-label {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.next-name {
+  font-family: var(--font-d);
+  font-size: 2.4rem;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+.btn-skip-rest {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted2);
+  padding: 10px 28px;
+  border-radius: var(--r-sm);
+  font-family: var(--font-m);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.14s;
+}
+.btn-skip-rest:hover { border-color: var(--muted2); color: var(--text); }
+
+/* ══════════════════════════════════════════════════════
+   PHASE TRANSITION
+══════════════════════════════════════════════════════ */
+#transitionScreen {
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+  position: relative;
+}
+
+.tr-badge {
+  font-family: var(--font-m);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tr-badge::before {
+  content: '';
+  display: inline-block;
+  width: 20px; height: 1px;
+  background: var(--muted);
+}
+
+.tr-headline {
+  font-family: var(--font-d);
+  font-size: clamp(5rem, 14vw, 11rem);
+  line-height: 0.88;
+  margin-bottom: 20px;
+}
+.tr-headline.hot   { color: var(--hot);   text-shadow: 0 0 80px var(--hot-glow); }
+.tr-headline.sky   { color: var(--sky);   text-shadow: 0 0 80px var(--sky-glow); }
+.tr-headline.spark { color: var(--spark); text-shadow: 0 0 80px var(--spark-glow); }
+
+.tr-detail {
+  font-size: 1rem;
+  color: var(--muted2);
+  line-height: 1.7;
+  max-width: 500px;
+  margin-bottom: 36px;
+}
+.tr-detail strong { color: var(--text); font-weight: 600; }
+
+.tr-cta-row { display: flex; align-items: center; gap: 20px; }
+
+.tr-deco {
+  position: absolute;
+  right: -30px;
+  bottom: -40px;
+  font-family: var(--font-d);
+  font-size: clamp(10rem, 28vw, 26rem);
+  line-height: 1;
+  opacity: 0.05;
+  user-select: none;
+  pointer-events: none;
+}
+.tr-deco.hot   { color: var(--hot); }
+.tr-deco.sky   { color: var(--sky); }
+.tr-deco.spark { color: var(--spark); }
+
+/* ══════════════════════════════════════════════════════
+   COMPLETE SCREEN
+══════════════════════════════════════════════════════ */
+#completeScreen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0;
+}
+
+.complete-eyebrow {
+  font-family: var(--font-m);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--hot);
+  margin-bottom: 10px;
+}
+
+.complete-title {
+  font-family: var(--font-d);
+  font-size: clamp(4.5rem, 11vw, 9rem);
+  line-height: 0.9;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.complete-sub {
+  font-size: 1rem;
+  color: var(--muted2);
+  max-width: 420px;
+  line-height: 1.65;
+  margin-bottom: 36px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 48px;
+  margin-bottom: 40px;
+}
+.stat { text-align: center; }
+.stat .val {
+  font-family: var(--font-m);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--hot);
+  text-shadow: 0 0 30px var(--hot-glow);
+  line-height: 1;
+}
+.stat .lbl {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.btn-done {
+  background: var(--hot);
+  color: var(--bg);
+  font-family: var(--font-d);
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  padding: 15px 56px;
+  border: none;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: transform 0.12s, filter 0.12s;
+}
+.btn-done:hover  { filter: brightness(1.1); transform: translateY(-2px); }
+.btn-done:active { transform: scale(0.97); }
+
+/* ══════════════════════════════════════════════════════
+   COUNTDOWN OVERLAY
+══════════════════════════════════════════════════════ */
+.countdown-overlay {
+  position: fixed; inset: 0;
+  background: rgba(5,8,16,0.96);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  flex-direction: column;
+  gap: 14px;
+}
+.countdown-overlay.active { display: flex; }
+
+.countdown-number {
+  font-family: var(--font-d);
+  font-size: 14rem;
+  color: var(--hot);
+  line-height: 1;
+  text-shadow: 0 0 100px var(--hot-glow);
+  animation: countPop 0.7s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes countPop {
+  from { transform: scale(1.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.countdown-text {
+  font-family: var(--font-m);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted2);
+}
+
+/* ══ Responsive ══ */
+@media (max-width: 900px) {
+  .exercise-main { grid-template-columns: 1fr; grid-template-rows: 38vh 1fr; }
+  .ex-name { font-size: 2rem; }
+}
+@media (max-width: 600px) {
+  .screen { padding: 20px; }
+  .start-title { font-size: 4rem; }
+  .phase-chips { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- Countdown Overlay -->
+<div class="countdown-overlay" id="countdownOverlay">
+  <div class="countdown-number" id="countdownNumber">3</div>
+  <div class="countdown-text"   id="countdownText">GET MOVING</div>
+</div>
+
+<!-- ══════ START SCREEN ══════ -->
+<div class="screen active" id="startScreen">
+  <div class="start-eyebrow">// Pre-Game Warm-Up</div>
+  <h1 class="start-title">FIELD<br><em>READY</em></h1>
+  <div class="phase-chips">
+    <div class="phase-chip hot"><span class="chip-num">5</span> Movement Activation</div>
+    <div class="phase-chip sky"><span class="chip-num">8</span> Mobility &amp; Stretching</div>
+    <div class="phase-chip spark"><span class="chip-num">5</span> Nervous System</div>
+  </div>
+  <div class="start-meta">18 exercises &middot; ~15 min &middot; UAP Dynamic Warm-Up Protocol</div>
+  <div class="start-cta">
+    <button class="btn-start" onclick="startWarmup()">Start Warm-Up</button>
+    <span class="start-hint">Space to begin</span>
+  </div>
+  <div class="start-deco">18</div>
+</div>
+
+<!-- ══════ EXERCISE SCREEN ══════ -->
+<div class="screen" id="exerciseScreen">
+  <div class="top-bar">
+    <div class="phase-pill" id="phasePill">
+      <div class="dot"></div>
+      <span id="phaseLabel">MOVEMENT</span>
+    </div>
+    <div class="top-right">
+      <span class="progress-text" id="progressText">1 / 5</span>
+      <button class="btn-skip-inline" onclick="skipExercise()">Skip →</button>
+    </div>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill hot" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="exercise-main">
+    <div class="gif-area" id="gifArea">
+      <div id="gifContent"></div>
+    </div>
+    <div class="info-panel">
+      <div class="ex-targets hot" id="exerciseTarget">TARGETS</div>
+      <div class="ex-name"        id="exerciseName">Exercise</div>
+      <div class="panel-divider"></div>
+      <div class="tips-header">Form Tips</div>
+      <div class="tips-list"      id="tipsList"></div>
+      <div class="action-area"    id="actionArea"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ REST SCREEN ══════ -->
+<div class="screen" id="restScreen">
+  <div class="rest-eyebrow">● Recovery</div>
+  <div class="rest-timer hot" id="restTimer">10</div>
+  <div class="next-label">Up Next</div>
+  <div class="next-name" id="nextExName">—</div>
+  <button class="btn-skip-rest" onclick="skipRest()">Skip →</button>
+</div>
+
+<!-- ══════ PHASE TRANSITION SCREEN ══════ -->
+<div class="screen" id="transitionScreen">
+  <div class="tr-badge"    id="trBadge">PART 1 COMPLETE ✓</div>
+  <div class="tr-headline" id="trHeadline">MOBILITY</div>
+  <div class="tr-detail"   id="trDetail">8 exercises</div>
+  <div class="tr-cta-row">
+    <button class="btn-start" id="trBtn" onclick="continueAfterTransition()">Continue →</button>
+    <span class="start-hint">Space to continue</span>
+  </div>
+  <div class="tr-deco" id="trDeco">GO</div>
+</div>
+
+<!-- ══════ COMPLETE SCREEN ══════ -->
+<div class="screen" id="completeScreen">
+  <div class="complete-eyebrow">// Warm-Up Complete</div>
+  <h1 class="complete-title">YOU'RE<br>READY</h1>
+  <p class="complete-sub">Nervous system primed. Body loose. Go get it.</p>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="val" id="statExercises">18</div>
+      <div class="lbl">Exercises</div>
+    </div>
+    <div class="stat">
+      <div class="val" id="statDuration">0:00</div>
+      <div class="lbl">Duration</div>
+    </div>
+  </div>
+  <button class="btn-done" onclick="location.reload()">Head to the Line →</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA — UAP Dynamic Warm-Up (theuap.com/blog/simple-dynamic-warm-up-routine)
+// ═══════════════════════════════════════════════════════════════
+
+const PHASES_META = [
+  {
+    id: 1, cls: 'hot', name: 'MOVEMENT',
+    badge:    'PART 1 COMPLETE ✓',
+    nextHead: 'MOBILITY',
+    nextCls:  'sky',
+    nextDetail: '<strong>8 exercises</strong> · dynamic range of motion<br>Take joints through their full range. Establish proper movement patterns.',
+    nextDeco: 'MOB',
+  },
+  {
+    id: 2, cls: 'sky', name: 'MOBILITY',
+    badge:    'PART 2 COMPLETE ✓',
+    nextHead: 'ACTIVATE',
+    nextCls:  'spark',
+    nextDetail: '<strong>5 exercises</strong> · nervous system priming<br>Recruit maximum fast-twitch fibers. Give these full intensity — they\'re short.',
+    nextDeco: 'FIRE',
+  },
+  {
+    id: 3, cls: 'spark', name: 'ACTIVATION',
+    badge: null, nextHead: null,
+  },
+];
+
+const WARMUP_PHASES = [
+  // ── PART 1: Movement Activation ────────────────────────────
+  { phaseId: 1, exercises: [
+    {
+      name: "Forward Run (60%)",
+      gif: "",
+      targets: "Full Body · Cardio Activation",
+      type: "timer", duration: 30, rest: 5,
+      tips: [
+        "Run at a conversational 60% effort — this is about blood flow, not performance",
+        "Focus on mechanics: upright posture, relaxed arms, mid-foot strike",
+        "On a field, go to half-field and back"
+      ]
+    },
+    {
+      name: "Backward Run",
+      gif: "",
+      targets: "Calves · Glutes · Coordination",
+      type: "timer", duration: 30, rest: 5,
+      tips: [
+        "Take large, deliberate strides — push back with each step",
+        "Keep your chest up; glance over one shoulder to navigate",
+        "Feel your calves and glutes light up — this is intentional posterior chain work"
+      ]
+    },
+    {
+      name: "Backward Skip",
+      gif: "",
+      targets: "Hip Flexors · Coordination · Rhythm",
+      type: "timer", duration: 30, rest: 5,
+      tips: [
+        "Rhythm matters more than speed — find a comfortable tempo going backward",
+        "Drive knees up slightly with each skip",
+        "Use your arms for balance; let them swing naturally"
+      ]
+    },
+    {
+      name: "Casual Skip",
+      gif: "",
+      targets: "Hip Flexors · Rhythm · Relaxation",
+      type: "timer", duration: 30, rest: 5,
+      tips: [
+        "A true casual skip — loose, rhythmic, and easy",
+        "Cover ground with each skip; don't rush",
+        "This is active recovery — let the warmup settle into your body"
+      ]
+    },
+    {
+      name: "Low Defensive Shuffle",
+      gif: "",
+      targets: "Glutes · Hip Abductors · Lateral Movement",
+      type: "timer", duration: 30, rest: 10,
+      tips: [
+        "Get into a low defensive stance: knees bent, hips back, chest up",
+        "Shuffle laterally, changing direction every 4 steps",
+        "Keep feet from crossing — quick, controlled lateral steps"
+      ]
+    },
+  ]},
+
+  // ── PART 2: Mobility & Dynamic Stretching ──────────────────
+  { phaseId: 2, exercises: [
+    {
+      name: "Lunge and Reach",
+      gif: "https://images.ctfassets.net/6ilvqec50fal/1nXwzRgW4ZeQ6E5KaQcqLh/2af9be36d4c7d1c8ecd162eb8d850006/Rad_reverse_lunges.gif",
+      targets: "Hip Flexors · T-Spine · Shoulders",
+      type: "reps", reps: "6 each side", rest: 5,
+      tips: [
+        "Step forward into a deep lunge, then reach both arms overhead",
+        "Actively rotate your torso toward your front knee as you reach",
+        "Feel the hip flexor stretch on your back leg — that's the target"
+      ]
+    },
+    {
+      name: "High Knee Hugs",
+      gif: "https://images.ctfassets.net/6ilvqec50fal/59xk5cwZL30GccWCrYZhKH/0750544e2f629e4668b729a6ec3d9188/High_Knees.gif",
+      targets: "Glutes · Hip Rotators · Balance",
+      type: "reps", reps: "8 each side", rest: 5,
+      tips: [
+        "Pull one knee up to your chest and hug it tight, balancing on one leg",
+        "Keep your standing leg slightly bent — not locked out",
+        "Walk forward alternating sides for the dynamic version"
+      ]
+    },
+    {
+      name: "Figure-4 Hugs",
+      gif: "",
+      targets: "Piriformis · IT Band · Hip External Rotators",
+      type: "reps", reps: "8 each side", rest: 5,
+      tips: [
+        "Place one ankle on the opposite thigh, then hug that leg toward your chest",
+        "You should feel this deep in the glute of the raised leg",
+        "Tight hip rotators are a leading cause of disc-related hamstring and groin strains"
+      ]
+    },
+    {
+      name: "Drinking Bird",
+      gif: "https://images.ctfassets.net/6ilvqec50fal/5793oZlBbtl5h2lDFravsH/27cc09caed8e2312c0e5adaa72acded7/single_leg_deadlift.gif",
+      targets: "Hamstrings · Glutes · Proprioception",
+      type: "reps", reps: "8 each side", rest: 5,
+      tips: [
+        "Stand on one leg, tip your torso forward reaching hands toward the floor",
+        "Your rear leg lifts as a counterbalance — keep it straight",
+        "Move slowly; the goal is hamstring length and balance, not touching the ground"
+      ]
+    },
+    {
+      name: "Walking Quad Stretch",
+      gif: "",
+      targets: "Quads · Hip Flexors · Balance",
+      type: "reps", reps: "10 each side", rest: 5,
+      tips: [
+        "Walk forward, pausing each step to pull one heel to your glute",
+        "Stand tall and squeeze the glute of the stretching leg — deepens the hip flexor stretch",
+        "Keep your knees together as you stretch — don't let the knee flare out"
+      ]
+    },
+    {
+      name: "Side-Side-Middle Lunge",
+      gif: "",
+      targets: "Adductors · Quads · Hip Mobility",
+      type: "reps", reps: "6 each direction", rest: 5,
+      tips: [
+        "Lunge right, lunge left, then drop into a center squat — that's one rep",
+        "On each side lunge, keep the opposite leg straight and feel the inner thigh stretch",
+        "Essential for disc: lateral agility starts with adductor mobility"
+      ]
+    },
+    {
+      name: "T-Spine Rotation",
+      gif: "",
+      targets: "Thoracic Spine · Shoulders · Rotators",
+      type: "reps", reps: "5 each side", rest: 5,
+      tips: [
+        "Stand hip-width, extend one arm forward then rotate it wide behind you",
+        "Hips stay forward — rotation comes from your upper back only",
+        "Throwing power comes from thoracic rotation; tight T-spines cost you distance"
+      ]
+    },
+    {
+      name: "Penguin Walk",
+      gif: "",
+      targets: "Hip Internal Rotators · Ankle Stability",
+      type: "timer", duration: 30, rest: 10,
+      tips: [
+        "Walk with toes pointed significantly outward for 5-10 yards, then reverse",
+        "Activates hip internal rotators often neglected in standard warm-ups",
+        "Keep weight evenly distributed — don't roll to the outside of your feet"
+      ]
+    },
+  ]},
+
+  // ── PART 3: Nervous System Activation ─────────────────────
+  { phaseId: 3, exercises: [
+    {
+      name: "Cycle Kicks",
+      gif: "",
+      targets: "Hip Flexors · Glutes · Explosive Power",
+      type: "timer", duration: 20, rest: 15,
+      tips: [
+        "Exaggerate the knee drive and heel recovery of a running stride",
+        "Think: knee up, kick forward, pull back, push down — like cycling through the air",
+        "These prime the exact neural pathways used in explosive sprints and cuts"
+      ]
+    },
+    {
+      name: "Lateral High Knee Skip",
+      gif: "",
+      targets: "Hip Flexors · Lateral Agility · Coordination",
+      type: "timer", duration: 20, rest: 15,
+      tips: [
+        "Skip laterally while driving your outside knee high on each skip",
+        "Land softly and immediately pop into the next rep — minimal ground contact",
+        "Drills the lateral hip flexor recruitment needed for cutting"
+      ]
+    },
+    {
+      name: "Lateral Skips",
+      gif: "",
+      targets: "Calf Power · Lateral Movement · Coordination",
+      type: "timer", duration: 20, rest: 15,
+      tips: [
+        "Skip sideways — leading with one leg, pulling the other to meet it",
+        "Stay on the balls of your feet; keep knees soft throughout",
+        "Mimics the footwork of marking and lateral repositioning"
+      ]
+    },
+    {
+      name: "Falling Leaf",
+      gif: "",
+      targets: "Coordination · Hip Rotation · Full Body",
+      type: "timer", duration: 20, rest: 15,
+      tips: [
+        "Carioca-style: step one foot behind the other while moving laterally",
+        "Let your hips rotate fully with each cross-step — relaxed, twisting skip",
+        "Focus on fluidity and rhythm over speed; coordination is the goal"
+      ]
+    },
+    {
+      name: "Leprechaun Skips",
+      gif: "",
+      targets: "Single-Leg Drive · Calf Power · Rhythm",
+      type: "timer", duration: 20, rest: 0,
+      tips: [
+        "Exaggerated skipping — drive one knee as high as possible, push hard off the other",
+        "Maximize both height and forward distance on each skip",
+        "Maximum single-leg drive power: directly applicable to deep cuts and layout bids"
+      ]
+    },
+  ]},
+];
+
+// Flatten into a single list with phase metadata
+const flatList = [];
+WARMUP_PHASES.forEach(phase => {
+  phase.exercises.forEach(ex => {
+    flatList.push({ ...ex, phaseId: phase.phaseId });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let state = {
+  flatIndex:    0,
+  timerInterval:null,
+  timerSeconds: 0,
+  timerRunning: false,
+  startTime:    null,
+};
+
+function getPhase(phaseId) { return PHASES_META[phaseId - 1]; }
+
+// ═══════════════════════════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'fade-in'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  void el.offsetWidth;
+  el.classList.add('fade-in');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════════════
+function startWarmup() {
+  state.flatIndex = 0;
+  state.startTime = Date.now();
+  showCountdown('Get Moving!', showExercise);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COUNTDOWN
+// ═══════════════════════════════════════════════════════════════
+function showCountdown(text, cb) {
+  const overlay = document.getElementById('countdownOverlay');
+  const numEl   = document.getElementById('countdownNumber');
+  const txtEl   = document.getElementById('countdownText');
+  txtEl.textContent = text.toUpperCase();
+  overlay.classList.add('active');
+  let n = 3;
+  numEl.textContent = n;
+  const iv = setInterval(() => {
+    n--;
+    if (n <= 0) {
+      clearInterval(iv);
+      overlay.classList.remove('active');
+      cb();
+    } else {
+      numEl.style.animation = 'none';
+      void numEl.offsetWidth;
+      numEl.style.animation = '';
+      numEl.textContent = n;
+    }
+  }, 800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHOW EXERCISE
+// ═══════════════════════════════════════════════════════════════
+function showExercise() {
+  if (state.flatIndex >= flatList.length) { showComplete(); return; }
+  clearTimer();
+
+  const ex    = flatList[state.flatIndex];
+  const phase = getPhase(ex.phaseId);
+  const cls   = phase.cls;
+
+  showScreen('exerciseScreen');
+
+  // Phase pill
+  const pill = document.getElementById('phasePill');
+  pill.className = `phase-pill ${cls}`;
+  document.getElementById('phaseLabel').textContent = phase.name;
+
+  // Progress
+  const phaseStart    = flatList.findIndex(e => e.phaseId === ex.phaseId);
+  const phaseLen      = WARMUP_PHASES[ex.phaseId - 1].exercises.length;
+  const idxInPhase    = state.flatIndex - phaseStart;
+  document.getElementById('progressText').textContent = `${idxInPhase + 1} / ${phaseLen}`;
+
+  const fill = document.getElementById('progressFill');
+  fill.className     = `progress-fill ${cls}`;
+  fill.style.width   = ((state.flatIndex + 1) / flatList.length * 100) + '%';
+
+  // GIF
+  const gifContent = document.getElementById('gifContent');
+  if (ex.gif) {
+    const esc = ex.name.replace(/'/g, "\\'");
+    gifContent.innerHTML = `<img src="${ex.gif}" alt="${ex.name}" onerror="onGifError(this,'${esc}','${cls}')">`;
+  } else {
+    gifContent.innerHTML = gifFallbackHTML(ex.name, cls);
+  }
+
+  // Info
+  const targEl     = document.getElementById('exerciseTarget');
+  targEl.textContent = ex.targets.toUpperCase();
+  targEl.className   = `ex-targets ${cls}`;
+  document.getElementById('exerciseName').textContent = ex.name;
+  document.getElementById('tipsList').innerHTML = ex.tips.map(t =>
+    `<div class="tip"><div class="tip-bullet"></div><div>${t}</div></div>`
+  ).join('');
+
+  renderAction(ex, cls);
+}
+
+function onGifError(img, name, cls) {
+  img.parentElement.innerHTML = gifFallbackHTML(name, cls || 'hot');
+}
+
+function gifFallbackHTML(name, cls) {
+  const n = name.toLowerCase();
+  let icon = '🏃';
+  if (n.includes('lunge') || n.includes('squat'))                         icon = '🦵';
+  else if (n.includes('skip') || n.includes('leprechaun') || n.includes('leaf') || n.includes('kick')) icon = '⚡';
+  else if (n.includes('quad') || n.includes('stretch') || n.includes('penguin')) icon = '🧘';
+  else if (n.includes('reach') || n.includes('rotation') || n.includes('spine')) icon = '🔄';
+  else if (n.includes('hug') || n.includes('figure') || n.includes('bird'))  icon = '🙆';
+  else if (n.includes('shuffle') || n.includes('lateral') || n.includes('defensive')) icon = '↔️';
+  const clsColor = cls === 'sky' ? 'rgba(0,200,255,0.12)' :
+                   cls === 'spark' ? 'rgba(255,27,107,0.12)' : 'rgba(255,87,20,0.12)';
+  return `<div class="gif-fallback" style="background:${clsColor}">
+    <div class="icon">${icon}</div>
+    <div class="name">${name}</div>
+    <div class="desc">Movement Demo</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION AREA
+// ═══════════════════════════════════════════════════════════════
+function renderAction(ex, cls) {
+  const area = document.getElementById('actionArea');
+  const circumference = 2 * Math.PI * 38; // r=38
+  let html = '';
+
+  if (ex.type === 'timer') {
+    state.timerSeconds = ex.duration;
+    html += `
+      <div class="timer-ring-wrap">
+        <svg class="timer-ring-svg" viewBox="0 0 100 100" onclick="toggleTimer()">
+          <circle class="timer-ring-bg"
+            cx="50" cy="50" r="38" stroke-width="6" fill="none" stroke="var(--border)"/>
+          <circle class="timer-ring-fill" id="timerRing"
+            cx="50" cy="50" r="38"
+            stroke-width="6" fill="none"
+            stroke="${cls === 'sky' ? 'var(--sky)' : cls === 'spark' ? 'var(--spark)' : 'var(--hot)'}"
+            stroke-linecap="round"
+            stroke-dasharray="${circumference}"
+            stroke-dashoffset="0"
+            transform="rotate(-90 50 50)"/>
+          <text class="timer-ring-text" id="timerDisplay" x="50" y="52">${ex.duration}</text>
+        </svg>
+        <div class="timer-ring-state ${cls}" id="timerState">TAP TO START</div>
+      </div>`;
+  } else {
+    const repText = typeof ex.reps === 'string' ? ex.reps : `${ex.reps} reps`;
+    html += `
+      <div class="rep-display ${cls}">${repText}</div>
+      <div class="rep-sublabel">reps</div>`;
+  }
+
+  html += `
+    <div class="btn-row">
+      ${ex.type === 'timer'
+        ? `<button class="btn btn-primary ${cls}" id="timerBtn" onclick="toggleTimer()">Start Timer</button>`
+        : `<button class="btn btn-primary ${cls}" onclick="completeExercise()">Done ✓</button>`
+      }
+      <button class="btn btn-ghost btn-skip-inline" onclick="skipExercise()">Skip →</button>
+    </div>`;
+
+  area.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════════
+function formatTime(s) { return s; }
+
+function toggleTimer() { state.timerRunning ? pauseTimer() : startTimer(); }
+
+function startTimer() {
+  state.timerRunning = true;
+  const btn   = document.getElementById('timerBtn');
+  const ring  = document.getElementById('timerRing');
+  const stLbl = document.getElementById('timerState');
+  const ex    = flatList[state.flatIndex];
+  const total = ex.duration;
+  const circumference = 2 * Math.PI * 38;
+
+  if (btn)   btn.textContent = 'Pause';
+  if (stLbl) stLbl.textContent = 'RUNNING';
+
+  state.timerInterval = setInterval(() => {
+    state.timerSeconds--;
+    const d = document.getElementById('timerDisplay');
+    const r = document.getElementById('timerRing');
+    if (d) d.textContent = state.timerSeconds;
+    if (r) r.style.strokeDashoffset = circumference * (state.timerSeconds / total);
+    if (state.timerSeconds <= 0) {
+      clearTimer();
+      playBeep();
+      completeExercise();
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  state.timerRunning = false;
+  clearInterval(state.timerInterval);
+  const btn   = document.getElementById('timerBtn');
+  const stLbl = document.getElementById('timerState');
+  if (btn)   btn.textContent = 'Resume';
+  if (stLbl) stLbl.textContent = 'PAUSED';
+}
+
+function clearTimer() {
+  state.timerRunning = false;
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  state.timerInterval = null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function completeExercise() {
+  clearTimer();
+  const ex = flatList[state.flatIndex];
+  state.flatIndex++;
+  if (state.flatIndex >= flatList.length) { showComplete(); return; }
+  const nextEx = flatList[state.flatIndex];
+  if (nextEx.phaseId !== ex.phaseId) { showPhaseTransition(ex.phaseId); return; }
+  ex.rest > 0 ? showRest(ex.rest, nextEx) : showExercise();
+}
+
+function skipExercise() {
+  clearTimer();
+  const ex = flatList[state.flatIndex];
+  state.flatIndex++;
+  if (state.flatIndex >= flatList.length) { showComplete(); return; }
+  const nextEx = flatList[state.flatIndex];
+  if (nextEx.phaseId !== ex.phaseId) { showPhaseTransition(ex.phaseId); return; }
+  showExercise();
+}
+
+function showRest(seconds, nextEx) {
+  showScreen('restScreen');
+  const ex  = flatList[state.flatIndex - 1];
+  const cls = ex ? getPhase(ex.phaseId).cls : 'hot';
+  const el  = document.getElementById('restTimer');
+  el.className  = `rest-timer ${cls}`;
+  el.textContent = seconds;
+  document.getElementById('nextExName').textContent = nextEx?.name || '—';
+
+  state.timerSeconds = seconds;
+  state.timerInterval = setInterval(() => {
+    state.timerSeconds--;
+    el.textContent = state.timerSeconds;
+    if (state.timerSeconds <= 0) { clearTimer(); playBeep(); showExercise(); }
+  }, 1000);
+}
+
+function skipRest() { clearTimer(); showExercise(); }
+
+// ═══════════════════════════════════════════════════════════════
+// PHASE TRANSITIONS
+// ═══════════════════════════════════════════════════════════════
+function showPhaseTransition(completedPhaseId) {
+  const ph = getPhase(completedPhaseId);
+  document.getElementById('trBadge').textContent    = ph.badge;
+  document.getElementById('trHeadline').textContent = ph.nextHead;
+  document.getElementById('trHeadline').className   = `tr-headline ${ph.nextCls}`;
+  document.getElementById('trDetail').innerHTML     = ph.nextDetail;
+  document.getElementById('trDeco').textContent     = ph.nextDeco;
+  document.getElementById('trDeco').className       = `tr-deco ${ph.nextCls}`;
+
+  const btn = document.getElementById('trBtn');
+  const color = ph.nextCls === 'sky' ? 'var(--sky)' : ph.nextCls === 'spark' ? 'var(--spark)' : 'var(--hot)';
+  btn.style.background = color;
+  btn.style.color      = 'var(--bg)';
+
+  showScreen('transitionScreen');
+}
+
+function continueAfterTransition() {
+  const ex    = flatList[state.flatIndex];
+  const phase = getPhase(ex?.phaseId || 1);
+  showCountdown(phase.name, showExercise);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMPLETE
+// ═══════════════════════════════════════════════════════════════
+function showComplete() {
+  clearTimer();
+  showScreen('completeScreen');
+  document.getElementById('statExercises').textContent = flatList.length;
+  const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  document.getElementById('statDuration').textContent =
+    `${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO
+// ═══════════════════════════════════════════════════════════════
+function playBeep() {
+  try {
+    const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880; osc.type = 'sine';
+    gain.gain.value = 0.3;
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.stop(ctx.currentTime + 0.3);
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  const active = id => document.getElementById(id).classList.contains('active');
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if      (active('startScreen'))      startWarmup();
+    else if (active('transitionScreen')) continueAfterTransition();
+    else if (active('exerciseScreen')) {
+      const timerBtn = document.getElementById('timerBtn');
+      timerBtn ? toggleTimer() : completeExercise();
+    }
+    else if (active('restScreen')) skipRest();
+  }
+  if (e.code === 'ArrowRight' || e.code === 'KeyN') {
+    if      (active('exerciseScreen'))   skipExercise();
+    else if (active('restScreen'))       skipRest();
+    else if (active('transitionScreen')) continueAfterTransition();
+  }
+});
+</script>
+</body>
+</html>
