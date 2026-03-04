@@ -666,16 +666,152 @@ body::before {
 .btn-done:active { transform: scale(0.97); }
 
 
+/* ── Exercise animation cards (Phase 1 field runs) ── */
+.ex-anim-card {
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 28px;
+}
+.ex-anim-cue {
+  font-family: var(--font-d);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.ex-anim-dot-track {
+  width: 72%; max-width: 280px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 3px;
+  position: relative;
+  overflow: visible;
+}
+.ex-anim-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  position: absolute;
+  top: -6.5px;
+  animation: dotFwd 1.6s cubic-bezier(.4,0,.6,1) infinite;
+}
+.ex-anim-dot.rev { animation: dotRev 1.6s cubic-bezier(.4,0,.6,1) infinite; }
+.ex-anim-dot.lat { animation: dotLat 1.1s ease-in-out infinite alternate; }
+@keyframes dotFwd { 0%{left:-5%} 100%{left:105%} }
+@keyframes dotRev { 0%{left:105%} 100%{left:-5%} }
+@keyframes dotLat { 0%{left:0%} 100%{left:calc(100% - 16px)} }
+
+.ex-anim-arrows {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.ex-anim-arr {
+  font-size: 1.6rem;
+  animation: arrPop 0.9s ease-in-out infinite;
+  line-height: 1;
+}
+.ex-anim-arr:nth-child(2) { animation-delay: 0.18s; }
+.ex-anim-arr:nth-child(3) { animation-delay: 0.36s; }
+@keyframes arrPop {
+  0%,100% { opacity: 0.25; transform: scale(0.85); }
+  50%      { opacity: 1;    transform: scale(1.1); }
+}
+.ex-anim-label {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted2);
+}
+
 /* ══ Responsive ══ */
 @media (max-width: 900px) {
-  .exercise-main { grid-template-columns: 1fr; grid-template-rows: 44vh 1fr; }
+  .exercise-main { grid-template-columns: 1fr; grid-template-rows: 40vh 1fr; }
   .ex-name { font-size: 2.2rem; }
   .rep-display { font-size: 2.4rem; }
+  .start-hint { display: none; }
 }
+
 @media (max-width: 600px) {
-  .screen { padding: 20px; }
-  .start-title { font-size: 4rem; }
-  .phase-chips { flex-wrap: wrap; }
+  /* ── Base screen ── */
+  .screen { padding: 16px; }
+  #exerciseScreen { padding: 10px 14px 14px; }
+
+  /* ── Start screen ── */
+  .start-title { font-size: clamp(3rem, 16vw, 4.2rem); }
+  .start-deco { font-size: clamp(9rem, 40vw, 15rem); right: -20px; bottom: -30px; }
+  .start-meta { font-size: 0.62rem; margin-bottom: 28px; }
+  .btn-start { padding: 14px 36px; font-size: 1.2rem; }
+  .start-cta { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .start-hint { display: none; }
+
+  /* ── Top bar ── */
+  .top-bar { padding-bottom: 6px; }
+  .btn-skip-inline,
+  .btn-back-inline {
+    padding: 9px 14px;
+    font-size: 0.58rem;
+    min-height: 38px;
+    border-radius: 8px;
+  }
+  .progress-text { font-size: 0.62rem; }
+  .top-right { gap: 8px; }
+
+  /* ── Exercise main ── */
+  .exercise-main { grid-template-rows: 36vh 1fr; gap: 12px; }
+  .gif-area { border-radius: 12px; }
+
+  /* ── Info panel ── */
+  .ex-targets { font-size: 0.55rem; margin-bottom: 4px; }
+  .ex-name { font-size: 1.65rem; margin-bottom: 10px; }
+  .panel-divider { margin-bottom: 10px; }
+  .tips-header { font-size: 0.62rem; margin-bottom: 6px; }
+  .tips-list { gap: 6px; margin-bottom: 10px; }
+  .tip { font-size: 0.88rem; gap: 8px; }
+
+  /* ── Action area ── */
+  .btn {
+    padding: 13px 22px;
+    font-size: 1rem;
+    min-height: 46px;
+  }
+  .btn-row { gap: 8px; margin-top: 8px; }
+  .btn-row .btn-primary { flex: 1; }
+  .timer-ring-svg { width: 80px; height: 80px; }
+  .timer-ring-wrap { margin-bottom: 8px; }
+  .rep-display { font-size: 2rem; margin-bottom: 0; }
+  .rep-sublabel { margin-bottom: 8px; }
+
+  /* ── Transition screen ── */
+  .tr-headline { font-size: clamp(3.5rem, 14vw, 6rem); }
+  .tr-detail { font-size: 0.9rem; margin-bottom: 28px; }
+  .tr-deco { display: none; }
+  .tr-cta-row .start-hint { display: none; }
+  .btn-start { font-size: 1.15rem; }
+
+  /* ── Complete screen ── */
+  .complete-title { font-size: clamp(3.5rem, 12vw, 5rem); }
+  .complete-sub { font-size: 0.9rem; margin-bottom: 28px; }
+  .stats-row { gap: 32px; margin-bottom: 32px; }
+  .stat .val { font-size: 2.4rem; }
+  .btn-done { padding: 14px 44px; font-size: 1.2rem; }
+
+  /* ── Anim cards ── */
+  .ex-anim-cue { font-size: 2rem; }
+  .ex-anim-arr { font-size: 1.3rem; }
+}
+
+/* Touch device: bump interactive targets */
+@media (hover: none) and (pointer: coarse) {
+  .btn-skip-inline,
+  .btn-back-inline { min-height: 40px; padding: 10px 16px; }
+  .timer-ring-svg { width: 82px; height: 82px; }
+  .btn { min-height: 46px; }
 }
 </style>
 </head>
@@ -796,6 +932,7 @@ const WARMUP_PHASES = [
     {
       name: "Forward Run (60% to half field)",
       gif: "",
+      anim: { dir: 'fwd', cue: '→ HALF FIELD', label: 'EASY PACE · 60% EFFORT' },
       targets: "Full Body · Cardio Activation",
       type: "reps",
       reps: "to half field",
@@ -810,6 +947,7 @@ const WARMUP_PHASES = [
     {
       name: "Backward Run (half field)",
       gif: "",
+      anim: { dir: 'rev', cue: '← HALF FIELD', label: 'LARGE STRIDES · CHEST UP' },
       targets: "Calves · Glutes · Coordination",
       type: "reps",
       reps: "to half field",
@@ -824,6 +962,7 @@ const WARMUP_PHASES = [
     {
       name: "Backward Skip (40 yards)",
       gif: "",
+      anim: { dir: 'rev', cue: '← SKIP BACK', label: 'FIND YOUR RHYTHM · 40 YDS' },
       targets: "Hip Flexors · Coordination · Rhythm",
       type: "reps",
       reps: "40 yards",
@@ -838,6 +977,7 @@ const WARMUP_PHASES = [
     {
       name: "Casual Skip (half field)",
       gif: "",
+      anim: { dir: 'fwd', cue: '→ EASY SKIP', label: 'LOOSE · RHYTHMIC · RELAXED' },
       targets: "Hip Flexors · Rhythm · Relaxation",
       type: "reps",
       reps: "to half field",
@@ -852,6 +992,7 @@ const WARMUP_PHASES = [
     {
       name: "Low Defensive Shuffle (half field)",
       gif: "",
+      anim: { dir: 'lat', cue: '↔ STAY LOW', label: 'KNEES BENT · HIPS BACK' },
       targets: "Glutes · Hip Abductors · Lateral Movement",
       type: "reps",
       reps: "to half field",
@@ -1091,7 +1232,7 @@ function showExercise() {
   fill.className     = `progress-fill ${cls}`;
   fill.style.width   = ((state.flatIndex + 1) / flatList.length * 100) + '%';
 
-  // media (video/gif)
+  // media (video/gif/animation)
   const gifContent = document.getElementById('gifContent');
   if (ex.video) {
     // embed youtube iframe configured as a looping silent clip (gif‑like)
@@ -1104,6 +1245,8 @@ function showExercise() {
   } else if (ex.gif) {
     const esc = ex.name.replace(/'/g, "\\'");
     gifContent.innerHTML = `<img src="${ex.gif}" alt="${ex.name}" onerror="onGifError(this,'${esc}','${cls}')">`;
+  } else if (ex.anim) {
+    gifContent.innerHTML = exerciseAnimHTML(ex.anim, cls);
   } else {
     gifContent.innerHTML = gifFallbackHTML(ex.name, cls);
   }
@@ -1122,6 +1265,24 @@ function showExercise() {
 
 function onGifError(img, name, cls) {
   img.parentElement.innerHTML = gifFallbackHTML(name, cls || 'hot');
+}
+
+function exerciseAnimHTML(anim, cls) {
+  const color    = cls === 'sky' ? 'var(--sky)' : cls === 'spark' ? 'var(--spark)' : 'var(--hot)';
+  const dimColor = cls === 'sky' ? 'rgba(0,200,255,0.07)' : cls === 'spark' ? 'rgba(255,27,107,0.07)' : 'rgba(255,87,20,0.07)';
+  const arrowCh  = anim.dir === 'rev' ? '‹' : anim.dir === 'lat' ? ['‹','·','›'].join('</div><div class="ex-anim-arr">') : '›';
+  const dotCls   = anim.dir === 'rev' ? 'rev' : anim.dir === 'lat' ? 'lat' : '';
+  const arrows   = anim.dir === 'lat'
+    ? `<div class="ex-anim-arr">‹</div><div class="ex-anim-arr">·</div><div class="ex-anim-arr">›</div>`
+    : `<div class="ex-anim-arr">${arrowCh}</div><div class="ex-anim-arr">${arrowCh}</div><div class="ex-anim-arr">${arrowCh}</div>`;
+  return `<div class="ex-anim-card" style="background:${dimColor}">
+    <div class="ex-anim-cue" style="color:${color}">${anim.cue}</div>
+    <div class="ex-anim-dot-track">
+      <div class="ex-anim-dot ${dotCls}" style="background:${color}"></div>
+    </div>
+    <div class="ex-anim-arrows" style="color:${color}">${arrows}</div>
+    <div class="ex-anim-label">${anim.label}</div>
+  </div>`;
 }
 
 function gifFallbackHTML(name, cls) {
